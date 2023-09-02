@@ -130,3 +130,5 @@ dmypy.json
 
 # Pycharm
 .idea/
+LJSpeech-1.1
+hubert

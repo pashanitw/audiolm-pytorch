@@ -157,6 +157,7 @@ def curtail_to_shortest_collate(data):
 def pad_to_longest_fn(data):
     return pad_sequence(data, batch_first = True)
 
-def get_dataloader(ds, pad_to_longest = True, **kwargs):
-    collate_fn = pad_to_longest_fn if pad_to_longest else curtail_to_shortest_collate
+def get_dataloader(ds, pad_to_longest = True, collate_fn=None, **kwargs):
+    if not exists(collate_fn):
+        collate_fn = pad_to_longest_fn if pad_to_longest else curtail_to_shortest_collate
     return DataLoader(ds, collate_fn = collate_fn, **kwargs)

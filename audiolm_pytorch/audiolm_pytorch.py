@@ -549,7 +549,7 @@ class SemanticTransformer(nn.Module):
 
         text_mask = None
         if not exists(text_embeds) and exists(text):
-            with torch.inference_mode():
+            with torch.no_grad():
                 text_embeds = self.embed_text(text, output_device = device)
                 text_mask = torch.any(text_embeds != 0, dim = -1)
 
@@ -1237,7 +1237,7 @@ class SemanticTransformerWrapper(nn.Module):
         assert not (self.transformer.has_condition ^ has_text)
 
         if not exists(text_embeds) and exists(text):
-            with torch.inference_mode():
+            with torch.no_grad():
                 text_embeds = self.transformer.embed_text(text, output_device = device)
 
         # start length and get running id output

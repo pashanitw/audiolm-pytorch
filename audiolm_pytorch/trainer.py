@@ -591,6 +591,7 @@ class SemanticTransformerTrainer(nn.Module):
         drop_last = False,
         force_clear_prev_results = None,
         average_valid_loss_over_grad_accum_every: bool = True, # if False, valid loss on a single batch
+        collate_fn = None,
     ):
         super().__init__()
         check_one_trainer()
@@ -660,9 +661,9 @@ class SemanticTransformerTrainer(nn.Module):
 
         # dataloader
 
-        self.dl = get_dataloader(self.ds, batch_size = batch_size, shuffle = True, drop_last = drop_last)
+        self.dl = get_dataloader(self.ds, batch_size = batch_size, shuffle = False, drop_last = drop_last, collate_fn = collate_fn)
 
-        self.valid_dl = get_dataloader(self.valid_ds, batch_size = batch_size, shuffle = True, drop_last = drop_last)
+        self.valid_dl = get_dataloader(self.valid_ds, batch_size = batch_size, shuffle = True, drop_last = drop_last, collate_fn = collate_fn)
 
         # prepare with accelerator
 

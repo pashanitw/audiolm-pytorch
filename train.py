@@ -169,6 +169,7 @@ def main(args):
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
             num_train_steps=steps,
+            grad_accum_every=4
         )
     if model_type == 'fine':
         trainer = FineTransformerTrainer(
@@ -176,7 +177,8 @@ def main(args):
             codec=encodec,
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
-            num_train_steps=steps
+            num_train_steps=steps,
+            data_max_length=320*64
         )
 
 

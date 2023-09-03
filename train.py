@@ -9,9 +9,11 @@ import csv
 from beartype import beartype
 from beartype.typing import Tuple, Union, Optional
 from beartype.door import is_bearable
-from audiolm_pytorch import HubertWithKmeans, SemanticTransformer, SemanticTransformerTrainer
+from audiolm_pytorch import HubertWithKmeans, SemanticTransformer, SemanticTransformerTrainer,\
+    CoarseTransformer, CoarseTransformerTrainer, FineTransformer, FineTransformerTrainer, EncodecWrapper
 from audiolm_pytorch.data import cast_tuple
 from torchaudio.functional import resample
+import argparse
 
 class SoundDataset(Dataset):
     @beartype
@@ -108,7 +110,7 @@ wav2vec = HubertWithKmeans(
     checkpoint_path = './hubert/hubert_base_ls960.pt',
     kmeans_path = './hubert/hubert_base_ls960_L9_km500.bin'
 )
-
+encodec = EncodecWrapper()
 semantic_transformer = SemanticTransformer(
     num_semantic_tokens = wav2vec.codebook_size,
     dim = 1024,
@@ -116,20 +118,92 @@ semantic_transformer = SemanticTransformer(
     flash_attn = False,
     has_condition=True,
     cond_as_self_attn_prefix=True,
-).cuda()
+)
+
+coarse_transformer = CoarseTransformer(
+    num_semantic_tokens = wav2vec.codebook_size,
+    codebook_size = 1024,
+    num_coarse_quantizers = 3,
+    dim = 512,
+    depth = 6,
+    flash_attn = False
+)
+
+
+fine_transformer = FineTransformer(
+    num_coarse_quantizers = 3,
+    num_fine_quantizers = 5,
+    codebook_size = 1024,
+    dim = 512,
+    depth = 6,
+    flash_attn = True
+)
 
 dataset = SoundDataset(
     folder = './LJSpeech-1.1',
     target_sample_hz=wav2vec.target_sample_hz,
 )
 
-trainer = SemanticTransformerTrainer(
-    transformer = semantic_transformer,
-    wav2vec = wav2vec,
-    dataset = dataset,
-    batch_size = 32,
-    num_train_steps = 1000,
-    collate_fn = collate_fn,
-)
+def main(args):
+    model_type = args.type
+    batch_size = args.batch_size
+    steps = args.steps
 
-trainer.train()
+    trainer = None
+
+    if model_type == 'semantic':
+        trainer = SemanticTransformerTrainer(
+            transformer=semantic_transformer,
+            wav2vec=wav2vec,
+            dataset=dataset,
+            batch_size=batch_size,
+            num_train_steps=steps,
+            collate_fn=collate_fn,
+        )
+
+    if model_type == 'coarse':
+        trainer = CoarseTransformerTrainer(
+            transformer=coarse_transformer,
+            codec = encodec,
+            wav2vec=wav2vec,
+            folder='./LJSpeech-1.1/wavs',
+            batch_size=batch_size,
+            num_train_steps=steps,
+        )
+    if model_type == 'fine':
+        trainer = FineTransformerTrainer(
+            transformer=fine_transformer,
+            codec=encodec,
+            folder='./LJSpeech-1.1/wavs',
+            batch_size=batch_size,
+            num_train_steps=steps
+        )
+
+
+    if trainer is not None:
+        trainer.train()
+
+    # ... Rest of your training code ...
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Training script for audio model")
+
+    # Adding argument for type
+    parser.add_argument('--type', type=str, required=True,
+                        choices=['semantic', 'coarse', 'fine'],  # You can list the valid model types here
+                        help="Specify the type of the model to be trained")
+
+    # Adding argument for batch size
+    parser.add_argument('--batch_size', type=int, default=32,
+                        help="Specify the batch size for training")
+
+    # Adding argument for steps
+    parser.add_argument('--steps', type=int, default=1000,
+                        help="Specify the number of training steps")
+
+    args = parser.parse_args()
+
+    if(args.type == 'semantic'):
+        print("Training semantic model")
+
+    main(args)

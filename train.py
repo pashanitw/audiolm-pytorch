@@ -126,7 +126,7 @@ coarse_transformer = CoarseTransformer(
     num_coarse_quantizers = 3,
     dim = 512,
     depth = 6,
-    flash_attn = True
+    flash_attn = False
 )
 
 
@@ -136,7 +136,7 @@ fine_transformer = FineTransformer(
     codebook_size = 1024,
     dim = 512,
     depth = 6,
-    flash_attn = True
+    flash_attn = False
 )
 
 dataset = SoundDataset(

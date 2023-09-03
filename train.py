@@ -126,7 +126,7 @@ coarse_transformer = CoarseTransformer(
     num_coarse_quantizers = 3,
     dim = 512,
     depth = 6,
-    flash_attn = False
+    flash_attn = True
 )
 
 
@@ -178,7 +178,8 @@ def main(args):
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
             num_train_steps=steps,
-            data_max_length=320*64
+            data_max_length=320*64,
+            grad_accum_every=4
         )
 
 

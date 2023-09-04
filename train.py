@@ -169,6 +169,7 @@ def main(args):
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
             num_train_steps=steps,
+            data_max_length=5,
             grad_accum_every=4
         )
     if model_type == 'fine':
@@ -178,7 +179,7 @@ def main(args):
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
             num_train_steps=steps,
-            data_max_length=320*64,
+            data_max_length_seconds=3,
             grad_accum_every=4
         )
 

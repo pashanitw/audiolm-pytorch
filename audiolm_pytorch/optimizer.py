@@ -12,7 +12,7 @@ def get_optimizer(
     params,
     lr = 1e-4,
     wd = 1e-2,
-    betas = (0.9, 0.99),
+    betas = (0.9, 0.95),
     eps = 1e-8,
     filter_by_requires_grad = False,
     group_wd_params = True,
@@ -32,10 +32,5 @@ def get_optimizer(
             {'params': no_wd_params, 'weight_decay': 0},
         ]
 
-    if use_lion:
-        return Lion(params, lr = lr, betas = betas, weight_decay = wd)
-
-    if not has_wd:
-        return Adam(params, lr = lr, betas = betas, eps = eps)
 
     return AdamW(params, lr = lr, weight_decay = wd, betas = betas, eps = eps)

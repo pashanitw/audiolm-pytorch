@@ -26,6 +26,7 @@ from ema_pytorch import EMA
 
 from audiolm_pytorch.soundstream import SoundStream
 from audiolm_pytorch.encodec import EncodecWrapper
+import math
 
 from audiolm_pytorch.audiolm_pytorch import (
     SemanticTransformer,
@@ -1093,8 +1094,11 @@ class FineTransformerTrainer(nn.Module):
         data_max_length_seconds = None,
         dataset_normalize = False,
         folder = None,
-        lr = 3e-4,
+        lr = 6e-4,
+        min_lr = 6e-5,
+        warmup_iters=4000,
         grad_accum_every = 1,
+        lr_decay_iters=10000,
         wd = 0.,
         max_grad_norm = 0.5,
         valid_frac = 0.05,
@@ -1132,6 +1136,8 @@ class FineTransformerTrainer(nn.Module):
         self.batch_size = batch_size
         self.grad_accum_every = grad_accum_every
 
+        self.best_val_loss = None
+
         # optimizers
 
         self.optim = get_optimizer(transformer.parameters(), lr = lr, wd = wd)
@@ -1143,6 +1149,14 @@ class FineTransformerTrainer(nn.Module):
         # create dataset
 
         self.ds = dataset
+
+        self.lr = lr
+
+        self.min_lr = min_lr
+
+        self.warmup_iters = warmup_iters
+
+        self.lr_decay_iters = lr_decay_iters
 
         if not exists(self.ds):
             assert exists(folder), 'folder must be passed in, if not passing in a custom dataset for text conditioned audio synthesis training'
@@ -1220,6 +1234,8 @@ class FineTransformerTrainer(nn.Module):
         pkg = dict(
             model = self.accelerator.get_state_dict(self.transformer),
             optim = self.optim.state_dict(),
+            steps = self.steps.item(),
+            best_val_loss = self.best_val_loss if self.best_val_loss is not None else 1000.00,
             version = __version__
         )
         torch.save(pkg, path)
@@ -1229,9 +1245,12 @@ class FineTransformerTrainer(nn.Module):
         pkg = transformer.load(path)
         # trainer-specific things
         self.optim.load_state_dict(pkg['optim'])
-
+        self.best_val_loss = float(pkg['best_val_loss'])
+        # print("==== previous steps ===", int(pkg['steps'])+1)
         # + 1 to start from the next step and avoid overwriting the last checkpoint
-        self.steps = torch.tensor([checkpoint_num_steps(path) + 1], device=self.device)
+        # self.steps = torch.tensor([checkpoint_num_steps(path) + 1], device=self.device)
+        self.steps = torch.tensor(int(pkg['steps'])+1, device=self.device)
+
 
     def print(self, msg):
         self.accelerator.print(msg)
@@ -1289,9 +1308,12 @@ class FineTransformerTrainer(nn.Module):
         self.optim.step()
         self.optim.zero_grad()
 
+        lr = self.optim.param_groups[0]['lr']
+        #format lr
+        lr = f'{lr:.2e}'
         # log
 
-        self.print(f"{steps}: loss: {logs['loss']}")
+        self.print(f"{steps}: loss: {logs['loss']} LR: {lr}")
         self.accelerator.log({"train_loss": logs['loss']}, step=steps)
 
         # sample results every so often
@@ -1308,24 +1330,55 @@ class FineTransformerTrainer(nn.Module):
                     valid_loss += self.train_wrapper(**data_kwargs, return_loss = True)
             valid_loss = valid_loss.clone() # avoid inference mode to non-inference mode error
             valid_loss /= self.average_valid_loss_over_grad_accum_every
-            self.print(f'{steps}: valid loss {valid_loss}')
+            self.print(f'{steps}: valid loss {valid_loss} best valid loss {self.best_val_loss}')
             self.accelerator.log({"valid_loss": valid_loss}, step=steps)
 
         # save model every so often
 
-        if self.is_main and not (steps % self.save_model_every):
-            model_path = str(self.results_folder / f'fine.transformer.{steps}.pt')
-            self.save(model_path)
+            save_checkpoint = False
+            current_val_loss = valid_loss.item()
 
-            self.print(f'{steps}: saving model to {str(self.results_folder)}')
+            if self.best_val_loss is None:
+                self.best_val_loss = current_val_loss
+                save_checkpoint = True
+            else:
+                if current_val_loss < self.best_val_loss:
+                    self.best_val_loss = current_val_loss
+                    save_checkpoint = True
+
+            if save_checkpoint:
+                model_path = str(self.results_folder / f'fine.transformer.pt')
+                self.save(model_path)
+                self.print(f'{steps}: saving model to {str(self.results_folder)}')
 
         self.steps += 1
         return logs
 
-    def train(self, log_fn = noop):
+    def train(self, log_fn=noop):
+        model_path = str(self.results_folder / f'fine.transformer.pt')
+
+        # Load checkpoint if it exists
+        if self.results_folder.exists() and (self.results_folder / 'fine.transformer.pt').exists():
+            self.load(model_path)
+            self.print(f'Checkpoint loaded from {model_path}')
 
         while self.steps < self.num_train_steps:
+            self.optim.param_groups[0]['lr'] = get_lr(self.steps.item(), self.lr, self.min_lr,self.warmup_iters, self.lr_decay_iters)
             logs = self.train_step()
             log_fn(logs)
 
         self.print('training complete')
+
+
+def get_lr(it, learning_rate, min_lr, warmup_iters, lr_decay_iters):
+    # 1) linear warmup for warmup_iters steps
+    if it < warmup_iters:
+        return learning_rate * it / warmup_iters
+    # 2) if it > lr_decay_iters, return min learning rate
+    if it > lr_decay_iters:
+        return min_lr
+    # 3) in between, use cosine decay down to min learning rate
+    decay_ratio = (it - warmup_iters) / (lr_decay_iters - warmup_iters)
+    assert 0 <= decay_ratio <= 1
+    coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff ranges 0..1
+    return min_lr + coeff * (learning_rate - min_lr)

@@ -14,12 +14,13 @@ from audiolm_pytorch import HubertWithKmeans, SemanticTransformer, SemanticTrans
 from audiolm_pytorch.data import cast_tuple
 from torchaudio.functional import resample
 import argparse
+import math
 
-print(torch.backends.cuda.flash_sdp_enabled())
-# True
-print(torch.backends.cuda.mem_efficient_sdp_enabled())
-# True
-print(torch.backends.cuda.math_sdp_enabled())
+# print(torch.backends.cuda.flash_sdp_enabled())
+# # True
+# print(torch.backends.cuda.mem_efficient_sdp_enabled())
+# # True
+# print(torch.backends.cuda.math_sdp_enabled())
 class SoundDataset(Dataset):
     @beartype
     def __init__(
@@ -183,9 +184,14 @@ def main(args):
             codec=encodec,
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
-            num_train_steps=steps,
+            num_train_steps=100000,
             data_max_length_seconds=3,
-            grad_accum_every=4
+            grad_accum_every=4,
+            save_results_every=5,
+            max_grad_norm=0.1,
+            wd=0.1,
+            warmup_iters=4000,
+            lr_decay_iters=70000
         )
 
 
@@ -216,3 +222,4 @@ if __name__ == '__main__':
         print("Training semantic model")
 
     main(args)
+

@@ -15,6 +15,11 @@ from audiolm_pytorch.data import cast_tuple
 from torchaudio.functional import resample
 import argparse
 
+print(torch.backends.cuda.flash_sdp_enabled())
+# True
+print(torch.backends.cuda.mem_efficient_sdp_enabled())
+# True
+print(torch.backends.cuda.math_sdp_enabled())
 class SoundDataset(Dataset):
     @beartype
     def __init__(

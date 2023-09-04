@@ -30,8 +30,6 @@ setup(
     'local-attention>=1.8.4',
     'scikit-learn',
     'sentencepiece',
-    'torch>=1.12',
-    'torchaudio',
     'transformers',
     'tqdm',
     'vector-quantize-pytorch>=1.7.0'

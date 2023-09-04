@@ -187,7 +187,7 @@ def main(args):
             num_train_steps=100000,
             data_max_length_seconds=3,
             grad_accum_every=4,
-            save_results_every=5,
+            save_results_every=100,
             max_grad_norm=0.1,
             wd=0.1,
             warmup_iters=4000,

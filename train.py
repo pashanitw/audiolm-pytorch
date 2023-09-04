@@ -136,7 +136,7 @@ fine_transformer = FineTransformer(
     codebook_size = 1024,
     dim = 512,
     depth = 6,
-    flash_attn = False
+    flash_attn = True
 )
 
 dataset = SoundDataset(

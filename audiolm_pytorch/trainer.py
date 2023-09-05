@@ -1348,8 +1348,8 @@ class FineTransformerTrainer(nn.Module):
                     save_checkpoint = True
 
             if save_checkpoint:
-                model_path = str(self.results_folder / f'fine.transformer.pt')
-                self.save(model_path)
+                # model_path = str(self.results_folder / f'fine.transformer.pt')
+                # self.save(model_path)
                 self.print(f'{steps}: saving model to {str(self.results_folder)}')
 
         self.steps += 1

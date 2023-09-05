@@ -1312,7 +1312,8 @@ class FineTransformerTrainer(nn.Module):
         #format lr
         lr = f'{lr:.2e}'
         # log
-
+        # print device rank
+        self.print(f"device: {self.accelerator.device} {steps}: loss: {logs['loss']} LR: {lr}")
         self.print(f"{steps}: loss: {logs['loss']} LR: {lr}")
         self.accelerator.log({"train_loss": logs['loss']}, step=steps)
 

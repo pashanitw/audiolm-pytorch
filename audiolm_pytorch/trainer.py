@@ -1291,16 +1291,26 @@ class FineTransformerTrainer(nn.Module):
         # logs
 
         logs = {}
+        self.print(f"************* 1 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}" )
 
         # update vae (generator)
 
         for _ in range(self.grad_accum_every):
             data_kwargs = self.data_tuple_to_kwargs(next(self.dl_iter))
+            self.print(
+                f"************* 2 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
+
             loss = self.train_wrapper(**data_kwargs, return_loss = True)
+            self.print(
+                f"*************3 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
 
             self.accelerator.backward(loss / self.grad_accum_every)
+            self.print(
+                f"*************4 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
 
             accum_log(logs, {'loss': loss.item() / self.grad_accum_every})
+            self.print(
+                f"*************5 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
 
         if exists(self.max_grad_norm):
             self.accelerator.clip_grad_norm_(self.transformer.parameters(), self.max_grad_norm)
@@ -1315,6 +1325,7 @@ class FineTransformerTrainer(nn.Module):
         # print device rank
         self.print(f"device: {self.accelerator.device} {steps}: loss: {logs['loss']} LR: {lr}")
         self.print(f"{steps}: loss: {logs['loss']} LR: {lr}")
+        self.print(f"************* local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}" )
         self.accelerator.log({"train_loss": logs['loss']}, step=steps)
 
         # sample results every so often
@@ -1323,6 +1334,7 @@ class FineTransformerTrainer(nn.Module):
 
         if self.is_main and not (steps % self.save_results_every):
             valid_loss = 0
+            self.print("=============== coming inside main ===============")
             for i in range(self.average_valid_loss_over_grad_accum_every):
                 data_kwargs = self.data_tuple_to_kwargs(next(self.valid_dl_iter))
                 self.print("=============== before eval ===============")

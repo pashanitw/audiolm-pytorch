@@ -1325,8 +1325,8 @@ class FineTransformerTrainer(nn.Module):
             valid_loss = 0
             for i in range(self.average_valid_loss_over_grad_accum_every):
                 data_kwargs = self.data_tuple_to_kwargs(next(self.valid_dl_iter))
-
-                with torch.inference_mode():
+                self.print("=============== before eval ===============")
+                with torch.no_grad():
                     self.train_wrapper.eval()
                     valid_loss += self.train_wrapper(**data_kwargs, return_loss = True)
             valid_loss = valid_loss.clone() # avoid inference mode to non-inference mode error

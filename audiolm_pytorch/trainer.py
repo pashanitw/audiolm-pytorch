@@ -27,6 +27,7 @@ from ema_pytorch import EMA
 from audiolm_pytorch.soundstream import SoundStream
 from audiolm_pytorch.encodec import EncodecWrapper
 import math
+import time
 
 from audiolm_pytorch.audiolm_pytorch import (
     SemanticTransformer,
@@ -662,7 +663,7 @@ class SemanticTransformerTrainer(nn.Module):
 
         # dataloader
 
-        self.dl = get_dataloader(self.ds, batch_size = batch_size, shuffle = False, drop_last = drop_last, collate_fn = collate_fn)
+        self.dl = get_dataloader(self.ds, batch_size = batch_size, shuffle = True, drop_last = drop_last, collate_fn = collate_fn)
 
         self.valid_dl = get_dataloader(self.valid_ds, batch_size = batch_size, shuffle = True, drop_last = drop_last, collate_fn = collate_fn)
 
@@ -1110,7 +1111,7 @@ class FineTransformerTrainer(nn.Module):
         split_batches = False,
         drop_last = False,
         force_clear_prev_results = None,
-        average_valid_loss_over_grad_accum_every: bool = True, # if False, valid loss on a single batch
+        average_valid_loss_over_grad_accum_every:int= 1, # if False, valid loss on a single batch
     ):
         super().__init__()
         check_one_trainer()
@@ -1193,7 +1194,7 @@ class FineTransformerTrainer(nn.Module):
 
         self.dl = get_dataloader(self.ds, batch_size = batch_size, shuffle = True, drop_last = drop_last)
 
-        self.valid_dl = get_dataloader(self.valid_ds, batch_size = batch_size, shuffle = True, drop_last = drop_last)
+        self.valid_dl = get_dataloader(self.valid_ds, batch_size = batch_size, shuffle = False, drop_last = drop_last)
 
         # prepare with accelerator
 
@@ -1209,6 +1210,7 @@ class FineTransformerTrainer(nn.Module):
             self.valid_dl
         )
 
+
         # dataloader iterators
 
         self.dl_iter = cycle(self.dl)
@@ -1219,10 +1221,16 @@ class FineTransformerTrainer(nn.Module):
 
         self.results_folder = Path(results_folder)
 
-        if force_clear_prev_results is True or (not exists(force_clear_prev_results) and len([*self.results_folder.glob('**/*')]) > 0 and yes_or_no('do you want to clear previous experiment checkpoints and results?')):
-            rmtree(str(self.results_folder))
+        # if force_clear_prev_results is True or (not exists(force_clear_prev_results) and len([*self.results_folder.glob('**/*')]) > 0 and yes_or_no('do you want to clear previous experiment checkpoints and results?')):
+        #     rmtree(str(self.results_folder))
+        
 
         self.results_folder.mkdir(parents = True, exist_ok = True)
+
+        model_path = str(self.results_folder / f'fine.transformer')
+        if self.results_folder.exists() and (self.results_folder / 'fine.transformer').exists():
+            print(f"loading model from {model_path}")
+            self.accelerator.load_state(model_path)
 
         hps = {"num_train_steps": num_train_steps, "data_max_length": data_max_length, "learning_rate": lr}
         self.accelerator.init_trackers("fine", config=hps)        
@@ -1231,25 +1239,22 @@ class FineTransformerTrainer(nn.Module):
         self.average_valid_loss_over_grad_accum_every = average_valid_loss_over_grad_accum_every
 
     def save(self, path):
-        pkg = dict(
-            model = self.accelerator.get_state_dict(self.transformer),
-            optim = self.optim.state_dict(),
-            steps = self.steps.item(),
-            best_val_loss = self.best_val_loss if self.best_val_loss is not None else 1000.00,
-            version = __version__
-        )
-        torch.save(pkg, path)
+        # torch.save({
+        #     'model': self.accelerator.unwrap_model(self.transformer).state_dict(),
+        #     'optim': self.optim.state_dict(),
+        #     'steps': self.steps,
+        #     'best_val_loss': self.best_val_loss
+        # }, path)
+        # self.accelerator.register_for_checkpointing(self.steps)
+        self.accelerator.save_state(path)
 
     def load(self, path):
-        transformer = self.accelerator.unwrap_model(self.transformer)
-        pkg = transformer.load(path)
-        # trainer-specific things
-        self.optim.load_state_dict(pkg['optim'])
-        self.best_val_loss = float(pkg['best_val_loss'])
-        # print("==== previous steps ===", int(pkg['steps'])+1)
-        # + 1 to start from the next step and avoid overwriting the last checkpoint
-        # self.steps = torch.tensor([checkpoint_num_steps(path) + 1], device=self.device)
-        self.steps = torch.tensor(int(pkg['steps'])+1, device=self.device)
+        # pkg = torch.load(path, map_location = self.device)
+        # self.accelerator.unwrap_model(self.transformer).load_state_dict(pkg['model'])
+        # self.optim.load_state_dict(pkg['optim'])
+        # self.steps = pkg['steps'] + 1
+        # self.best_val_loss = pkg['best_val_loss']
+        self.accelerator.load_state(path)
 
 
     def print(self, msg):
@@ -1291,26 +1296,16 @@ class FineTransformerTrainer(nn.Module):
         # logs
 
         logs = {}
-        self.print(f"************* 1 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}" )
 
         # update vae (generator)
 
         for _ in range(self.grad_accum_every):
             data_kwargs = self.data_tuple_to_kwargs(next(self.dl_iter))
-            self.print(
-                f"************* 2 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
-
             loss = self.train_wrapper(**data_kwargs, return_loss = True)
-            self.print(
-                f"*************3 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
 
             self.accelerator.backward(loss / self.grad_accum_every)
-            self.print(
-                f"*************4 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
 
             accum_log(logs, {'loss': loss.item() / self.grad_accum_every})
-            self.print(
-                f"*************5 local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}")
 
         if exists(self.max_grad_norm):
             self.accelerator.clip_grad_norm_(self.transformer.parameters(), self.max_grad_norm)
@@ -1325,58 +1320,80 @@ class FineTransformerTrainer(nn.Module):
         # print device rank
         self.print(f"device: {self.accelerator.device} {steps}: loss: {logs['loss']} LR: {lr}")
         self.print(f"{steps}: loss: {logs['loss']} LR: {lr}")
-        self.print(f"************* local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}" )
+        # self.print(f"************* local process index **** device {self.accelerator.device} local process{self.accelerator.local_process_index}" )
         self.accelerator.log({"train_loss": logs['loss']}, step=steps)
 
         # sample results every so often
 
         self.accelerator.wait_for_everyone()
 
-        if self.is_main and not (steps % self.save_results_every):
-            valid_loss = 0
-            self.print("=============== coming inside main ===============")
-            for i in range(self.average_valid_loss_over_grad_accum_every):
+        if self.is_main and not (steps % self.save_results_every) and steps > 0:
+            valid_loss = 0.0
+            print(f"inside validation loop {self.accelerator.device} ")
+
+            avg_loss_iterations = 1  # Default value for the number of iterations
+            if isinstance(self.average_valid_loss_over_grad_accum_every, int):
+                avg_loss_iterations = self.average_valid_loss_over_grad_accum_every
+
+            for i in range(avg_loss_iterations):
+                print(f"inside validation loop {avg_loss_iterations} ")
                 data_kwargs = self.data_tuple_to_kwargs(next(self.valid_dl_iter))
-                self.print("=============== before eval ===============")
-                with torch.no_grad():
+                with torch.inference_mode():
                     self.train_wrapper.eval()
-                    valid_loss += self.train_wrapper(**data_kwargs, return_loss = True)
-            valid_loss = valid_loss.clone() # avoid inference mode to non-inference mode error
-            valid_loss /= self.average_valid_loss_over_grad_accum_every
-            self.print(f'{steps}: valid loss {valid_loss} best valid loss {self.best_val_loss}')
-            self.accelerator.log({"valid_loss": valid_loss}, step=steps)
+                    valid_loss += self.train_wrapper(**data_kwargs, return_loss=True)
 
-        # save model every so often
+            print(f"after inference mode {self.accelerator.device}")
 
-            save_checkpoint = False
-            current_val_loss = valid_loss.item()
-
-            if self.best_val_loss is None:
-                self.best_val_loss = current_val_loss
-                save_checkpoint = True
+            if valid_loss == 0.0:
+                print("Warning: valid_loss is zero, it seems the validation loop is not being entered.")
             else:
-                if current_val_loss < self.best_val_loss:
-                    self.best_val_loss = current_val_loss
-                    save_checkpoint = True
+                valid_loss = valid_loss.clone()
+                valid_loss /= avg_loss_iterations
+                self.print(f'{steps}: valid loss {valid_loss} best valid loss {self.best_val_loss}')
+                self.accelerator.log({"valid_loss": valid_loss}, step=steps)
+                print(f"valid loss calculated {self.accelerator.device}")
 
-            if save_checkpoint:
-                # model_path = str(self.results_folder / f'fine.transformer.pt')
-                # self.save(model_path)
-                self.print(f'{steps}: saving model to {str(self.results_folder)}')
+            # save model every so often
+        if not (steps % self.save_results_every) and steps > 0:
+            self.save(str(self.results_folder / f'fine.transformer'))
+                # save_checkpoint = False
+                # current_val_loss = valid_loss.item()
+                #
+                # if self.best_val_loss is None:
+                #     self.best_val_loss = current_val_loss
+                #     save_checkpoint = True
+                # else:
+                #     if current_val_loss < self.best_val_loss:
+                #         self.best_val_loss = current_val_loss
+                #         save_checkpoint = True
+                #
+                # if save_checkpoint:
+                #     model_path = str(self.results_folder / f'fine.transformer')
+                #     self.save(model_path)
+                #     self.print(f'{steps}: saving model to {str(self.results_folder)}')
 
         self.steps += 1
         return logs
 
     def train(self, log_fn=noop):
-        model_path = str(self.results_folder / f'fine.transformer.pt')
-
-        # Load checkpoint if it exists
-        if self.results_folder.exists() and (self.results_folder / 'fine.transformer.pt').exists():
-            self.load(model_path)
-            self.print(f'Checkpoint loaded from {model_path}')
+        model_path = str(self.results_folder / f'fine.transformer')
+        # if self.is_main:
+        #     # Load checkpoint if it exists
+        #     print(
+        #         f"starting training {self.accelerator.device}")
+        #     if self.results_folder.exists() and (self.results_folder / 'fine.transformer').exists():
+        #         self.load(model_path)
+        #         self.print(f'Checkpoint loaded from {model_path}')
+        # print(
+        #     f"training started on device {self.accelerator.device} and is main? {self.accelerator.is_main_process} ")
+        # if self.results_folder.exists() and (self.results_folder / 'fine.transformer').exists():
+        #     print(f"loading model from {model_path}")
+        #     self.accelerator.load_state(model_path)
 
         while self.steps < self.num_train_steps:
             self.optim.param_groups[0]['lr'] = get_lr(self.steps.item(), self.lr, self.min_lr,self.warmup_iters, self.lr_decay_iters)
+            print(
+                f"LR stepm {self.steps} {self.accelerator.device} and is main? {self.accelerator.is_main_process} ")
             logs = self.train_step()
             log_fn(logs)
 

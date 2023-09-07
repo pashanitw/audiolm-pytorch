@@ -112,46 +112,55 @@ def collate_fn(batch):
 # hubert checkpoints can be downloaded at
 # https://github.com/facebookresearch/fairseq/tree/main/examples/hubert
 
+
 wav2vec = HubertWithKmeans(
-    checkpoint_path = './hubert/hubert_base_ls960.pt',
-    kmeans_path = './hubert/hubert_base_ls960_L9_km500.bin'
-)
-encodec = EncodecWrapper()
-semantic_transformer = SemanticTransformer(
-    num_semantic_tokens = wav2vec.codebook_size,
-    dim = 1024,
-    depth = 6,
-    flash_attn = False,
-    has_condition=True,
-    cond_as_self_attn_prefix=True,
-)
+        checkpoint_path='./hubert/hubert_base_ls960.pt',
+        kmeans_path='./hubert/hubert_base_ls960_L9_km500.bin'
+    )
+def get_semantic_transformer():
+    semantic_transformer = SemanticTransformer(
+        num_semantic_tokens = wav2vec.codebook_size,
+        dim = 1024,
+        depth = 6,
+        flash_attn = False,
+        has_condition=True,
+        cond_as_self_attn_prefix=True,
+    )
 
-coarse_transformer = CoarseTransformer(
-    num_semantic_tokens = wav2vec.codebook_size,
-    codebook_size = 1024,
-    num_coarse_quantizers = 3,
-    dim = 512,
-    depth = 6,
-    flash_attn = False
-)
+    return semantic_transformer
 
+def get_coarse_transformer():
+    coarse_transformer = CoarseTransformer(
+        num_semantic_tokens = wav2vec.codebook_size,
+        codebook_size = 1024,
+        num_coarse_quantizers = 3,
+        dim = 512,
+        depth = 6,
+        flash_attn = False
+    )
+    return coarse_transformer
 
-fine_transformer = FineTransformer(
-    num_coarse_quantizers = 3,
-    num_fine_quantizers = 5,
-    codebook_size = 1024,
-    dim = 768,
-    depth = 6,
-    heads=12,
-    flash_attn = False
-)
+def get_fine_transformer():
+    fine_transformer = FineTransformer(
+        num_coarse_quantizers = 3,
+        num_fine_quantizers = 5,
+        codebook_size = 1024,
+        dim = 768,
+        depth = 6,
+        heads=12,
+        flash_attn = False
+    )
+    return fine_transformer
 
 dataset = SoundDataset(
     folder = './LJSpeech-1.1',
     target_sample_hz=wav2vec.target_sample_hz,
 )
 
+
 def main(args):
+
+    encodec = EncodecWrapper()
     model_type = args.type
     batch_size = args.batch_size
     steps = args.steps
@@ -159,8 +168,9 @@ def main(args):
     trainer = None
 
     if model_type == 'semantic':
+        transformer = get_semantic_transformer()
         trainer = SemanticTransformerTrainer(
-            transformer=semantic_transformer,
+            transformer=transformer,
             wav2vec=wav2vec,
             dataset=dataset,
             batch_size=batch_size,
@@ -169,8 +179,9 @@ def main(args):
         )
 
     if model_type == 'coarse':
+        transformer = get_coarse_transformer()
         trainer = CoarseTransformerTrainer(
-            transformer=coarse_transformer,
+            transformer=transformer,
             codec = encodec,
             wav2vec=wav2vec,
             folder='./LJSpeech-1.1/wavs',
@@ -180,24 +191,25 @@ def main(args):
             grad_accum_every=4
         )
     if model_type == 'fine':
+        transformer = get_fine_transformer()
         trainer = FineTransformerTrainer(
-            transformer=fine_transformer,
+            transformer=transformer,
             codec=encodec,
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
             num_train_steps=100000,
             data_max_length_seconds=3,
             grad_accum_every=4,
-            save_results_every=100,
+            save_results_every=10,
             max_grad_norm=0.1,
             wd=0.1,
             warmup_iters=4000,
-            lr_decay_iters=70000
+            lr_decay_iters=70000,
+            average_valid_loss_over_grad_accum_every=10,
         )
 
 
-    if trainer is not None:
-        trainer.train()
+    return trainer
 
     # ... Rest of your training code ...
 
@@ -222,5 +234,9 @@ if __name__ == '__main__':
     if(args.type == 'semantic'):
         print("Training semantic model")
 
-    main(args)
+    trainer = main(args)
+
+    if trainer is not None:
+        trainer.train()
+
 

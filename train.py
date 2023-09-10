@@ -136,7 +136,7 @@ def get_coarse_transformer():
         num_coarse_quantizers = 3,
         dim = 512,
         depth = 6,
-        flash_attn = False
+        flash_attn = True
     )
     return coarse_transformer
 
@@ -145,9 +145,9 @@ def get_fine_transformer():
         num_coarse_quantizers = 3,
         num_fine_quantizers = 5,
         codebook_size = 1024,
-        dim = 768,
+        dim = 256,
         depth = 6,
-        heads=12,
+        heads=8,
         flash_attn = False
     )
     return fine_transformer
@@ -199,13 +199,15 @@ def main(args):
             batch_size=batch_size,
             num_train_steps=100000,
             data_max_length_seconds=3,
-            grad_accum_every=4,
-            save_results_every=10,
-            max_grad_norm=0.1,
-            wd=0.1,
+            grad_accum_every=1,
+            save_results_every=400,
+            max_grad_norm=1.0,
+            wd=1e-1,
             warmup_iters=4000,
-            lr_decay_iters=70000,
-            average_valid_loss_over_grad_accum_every=10,
+            lr_decay_iters=80000,
+            average_valid_loss_over_grad_accum_every=20,
+            lr = 3e-4,
+            min_lr = 3e-6,
         )
 
 

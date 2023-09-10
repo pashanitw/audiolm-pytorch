@@ -1080,6 +1080,18 @@ class CoarseTransformerTrainer(nn.Module):
 
 # fine transformer trainer
 
+class ExtraInfo:
+    def __init__(self, device):
+        self.best_val_loss = float('inf')
+        self.steps = torch.tensor(0, device=device)
+
+    def state_dict(self):
+        return {'best_val_loss': self.best_val_loss, 'steps': self.steps}
+
+    def load_state_dict(self, state_dict):
+        self.best_val_loss = state_dict['best_val_loss']
+        self.steps = state_dict['steps']
+
 class FineTransformerTrainer(nn.Module):
     @beartype
     def __init__(
@@ -1095,8 +1107,8 @@ class FineTransformerTrainer(nn.Module):
         data_max_length_seconds = None,
         dataset_normalize = False,
         folder = None,
-        lr = 6e-4,
-        min_lr = 6e-5,
+        lr = 3e-4,
+        min_lr = 3e-5,
         warmup_iters=4000,
         grad_accum_every = 1,
         lr_decay_iters=10000,
@@ -1120,6 +1132,8 @@ class FineTransformerTrainer(nn.Module):
             split_batches = split_batches,
             **accelerate_kwargs
         )
+        self.extra_info = ExtraInfo(self.device)
+        self.accelerator.register_for_checkpointing(self.extra_info)
 
         self.transformer = transformer
         self.codec = codec
@@ -1137,7 +1151,7 @@ class FineTransformerTrainer(nn.Module):
         self.batch_size = batch_size
         self.grad_accum_every = grad_accum_every
 
-        self.best_val_loss = None
+
 
         # optimizers
 
@@ -1238,7 +1252,8 @@ class FineTransformerTrainer(nn.Module):
         self.train_wrapper.to(self.device)
         self.average_valid_loss_over_grad_accum_every = average_valid_loss_over_grad_accum_every
 
-    def save(self, path):
+    def save(self, steps):
+        self.extra_info.steps = steps
         # torch.save({
         #     'model': self.accelerator.unwrap_model(self.transformer).state_dict(),
         #     'optim': self.optim.state_dict(),
@@ -1246,7 +1261,12 @@ class FineTransformerTrainer(nn.Module):
         #     'best_val_loss': self.best_val_loss
         # }, path)
         # self.accelerator.register_for_checkpointing(self.steps)
-        self.accelerator.save_state(path)
+        self.accelerator.save_state(str(self.results_folder / f'fine.transformer'))
+    def save_best(self, steps, valid_loss):
+        self.extra_info.steps = steps
+        if valid_loss < self.extra_info.best_val_loss:
+            self.extra_info.best_val_loss = valid_loss.item()
+            self.accelerator.save_state(str(self.results_folder / f'fine.transformer.best'))
 
     def load(self, path):
         # pkg = torch.load(path, map_location = self.device)
@@ -1255,6 +1275,7 @@ class FineTransformerTrainer(nn.Module):
         # self.steps = pkg['steps'] + 1
         # self.best_val_loss = pkg['best_val_loss']
         self.accelerator.load_state(path)
+        self.extra_info.steps = self.extra_info.steps + 1
 
 
     def print(self, msg):
@@ -1347,30 +1368,18 @@ class FineTransformerTrainer(nn.Module):
             if valid_loss == 0.0:
                 print("Warning: valid_loss is zero, it seems the validation loop is not being entered.")
             else:
+                best_val_loss = self.extra_info.best_val_loss
                 valid_loss = valid_loss.clone()
                 valid_loss /= avg_loss_iterations
-                self.print(f'{steps}: valid loss {valid_loss} best valid loss {self.best_val_loss}')
+                self.print(f'{steps}: valid loss {valid_loss} best valid loss {best_val_loss}')
                 self.accelerator.log({"valid_loss": valid_loss}, step=steps)
                 print(f"valid loss calculated {self.accelerator.device}")
+                self.save_best(self.steps, valid_loss)
 
-            # save model every so often
+
+            # this is an experiment to know what happens we save at every gpu
         if not (steps % self.save_results_every) and steps > 0:
-            self.save(str(self.results_folder / f'fine.transformer'))
-                # save_checkpoint = False
-                # current_val_loss = valid_loss.item()
-                #
-                # if self.best_val_loss is None:
-                #     self.best_val_loss = current_val_loss
-                #     save_checkpoint = True
-                # else:
-                #     if current_val_loss < self.best_val_loss:
-                #         self.best_val_loss = current_val_loss
-                #         save_checkpoint = True
-                #
-                # if save_checkpoint:
-                #     model_path = str(self.results_folder / f'fine.transformer')
-                #     self.save(model_path)
-                #     self.print(f'{steps}: saving model to {str(self.results_folder)}')
+                self.save(self.steps)
 
         self.steps += 1
         return logs
@@ -1384,14 +1393,17 @@ class FineTransformerTrainer(nn.Module):
         #     if self.results_folder.exists() and (self.results_folder / 'fine.transformer').exists():
         #         self.load(model_path)
         #         self.print(f'Checkpoint loaded from {model_path}')
-        # print(
-        #     f"training started on device {self.accelerator.device} and is main? {self.accelerator.is_main_process} ")
-        # if self.results_folder.exists() and (self.results_folder / 'fine.transformer').exists():
-        #     print(f"loading model from {model_path}")
-        #     self.accelerator.load_state(model_path)
+        print(
+            f"training started on device {self.accelerator.device} and is main? {self.accelerator.is_main_process} ")
+        if self.results_folder.exists() and (self.results_folder / 'fine.transformer').exists():
+            print(f"loading model from {model_path}")
+            self.load(model_path)
 
+
+        self.steps = self.extra_info.steps
         while self.steps < self.num_train_steps:
-            self.optim.param_groups[0]['lr'] = get_lr(self.steps.item(), self.lr, self.min_lr,self.warmup_iters, self.lr_decay_iters)
+            # self.optim.param_groups[0]['lr'] = get_cycle_lr(self.steps.item(), self.lr, self.min_lr,self.warmup_iters, 10000)
+            self.optim.param_groups[0]['lr'] = get_lr(self.steps.item(), self.lr, self.min_lr, self.warmup_iters,self.lr_decay_iters)
             print(
                 f"LR stepm {self.steps} {self.accelerator.device} and is main? {self.accelerator.is_main_process} ")
             logs = self.train_step()
@@ -1411,4 +1423,19 @@ def get_lr(it, learning_rate, min_lr, warmup_iters, lr_decay_iters):
     decay_ratio = (it - warmup_iters) / (lr_decay_iters - warmup_iters)
     assert 0 <= decay_ratio <= 1
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff ranges 0..1
+    return min_lr + coeff * (learning_rate - min_lr)
+
+def get_cycle_lr(it, learning_rate, min_lr, warmup_iters, cycle_len):
+    # Step 1: Linear warmup for warmup_iters steps
+    if it < warmup_iters:
+        return learning_rate * it / warmup_iters
+
+    # Step 2: Cyclical learning rate with cosine annealing
+    it = (it - warmup_iters) % cycle_len  # Calculate iteration within the current cycle
+    cycle_progress = it / cycle_len  # Calculate progress within the current cycle (ranges from 0 to 1)
+
+    # Calculate cosine annealing coefficient (ranges from 0 to 1)
+    coeff = 0.5 * (1.0 + math.cos(math.pi * cycle_progress))
+
+    # Return learning rate as per the cyclical policy
     return min_lr + coeff * (learning_rate - min_lr)

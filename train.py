@@ -16,6 +16,10 @@ from torchaudio.functional import resample
 import argparse
 import math
 
+import torch.distributed as dist
+
+
+
 # print(torch.backends.cuda.flash_sdp_enabled())
 # # True
 # print(torch.backends.cuda.mem_efficient_sdp_enabled())
@@ -129,6 +133,7 @@ def get_semantic_transformer():
 
     return semantic_transformer
 
+
 def get_coarse_transformer():
     coarse_transformer = CoarseTransformer(
         num_semantic_tokens = wav2vec.codebook_size,
@@ -145,9 +150,9 @@ def get_fine_transformer():
         num_coarse_quantizers = 3,
         num_fine_quantizers = 5,
         codebook_size = 1024,
-        dim = 256,
-        depth = 6,
-        heads=8,
+        dim = 1024,
+        depth = 1,
+        heads=12,
         flash_attn = False
     )
     return fine_transformer
@@ -158,7 +163,7 @@ dataset = SoundDataset(
 )
 
 
-def main(args):
+def main(args, unknown):
 
     encodec = EncodecWrapper()
     model_type = args.type
@@ -191,54 +196,59 @@ def main(args):
             grad_accum_every=4
         )
     if model_type == 'fine':
+        # print uknown args
         transformer = get_fine_transformer()
         trainer = FineTransformerTrainer(
             transformer=transformer,
             codec=encodec,
             folder='./LJSpeech-1.1/wavs',
             batch_size=batch_size,
-            num_train_steps=100000,
+            num_train_steps=120000,
             data_max_length_seconds=3,
             grad_accum_every=1,
             save_results_every=400,
             max_grad_norm=1.0,
             wd=1e-1,
-            warmup_iters=4000,
-            lr_decay_iters=80000,
+            warmup_iters=5000,
+            lr_decay_iters=90000,
             average_valid_loss_over_grad_accum_every=20,
             lr = 3e-4,
-            min_lr = 3e-6,
+            min_lr = 3e-5
         )
 
 
     return trainer
 
     # ... Rest of your training code ...
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Training script for audio model")
 
     # Adding argument for type
-    parser.add_argument('--type', type=str, required=True,
+    parser.add_argument('--type', type=str, default='fine',
                         choices=['semantic', 'coarse', 'fine'],  # You can list the valid model types here
                         help="Specify the type of the model to be trained")
 
     # Adding argument for batch size
-    parser.add_argument('--batch_size', type=int, default=32,
+    parser.add_argument('--batch_size', type=int, default=8,
                         help="Specify the batch size for training")
 
     # Adding argument for steps
     parser.add_argument('--steps', type=int, default=1000,
                         help="Specify the number of training steps")
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()  # Ignore unrecognized arguments
 
-    if(args.type == 'semantic'):
+    if args.type == 'semantic':
         print("Training semantic model")
 
-    trainer = main(args)
+    print("=== args and unknown args ===")
+    print(args)
+    print(unknown)
+
+    trainer = main(args, unknown)
 
     if trainer is not None:
         trainer.train()
+
 
 

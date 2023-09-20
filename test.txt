@@ -1,0 +1,728 @@
+Node: scn1-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+kaditya
+scn1-10g
+mayankr
+scn1-10g
+smallah
+scn1-10g
+smallah
+scn1-10g
+smallah
+scn1-10g
+smallah
+scn1-10g
+Node: scn15-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn15-10g
+mehtabr
+scn15-10g
+Node: scn16-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+gaganp
+scn16-10g
+rfshah
+scn16-10g
+mrana
+scn16-10g
+adlaxmi
+scn16-10g
+Node: scn21-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+ankushb
+scn21-10g
+rfshah
+scn21-10g
+karunesh
+scn21-10g
+mehtabr
+scn21-10g
+Node: scn23-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 5, GPUs Available: 3
+srkumar
+scn23-10g
+mayankr
+scn23-10g
+mayankr
+scn23-10g
+smallah
+scn23-10g
+Node: scn25-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn25-10g
+mrana
+scn25-10g
+mayankr
+scn25-10g
+skpanda
+scn25-10g
+Node: scn27-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+amolbr
+scn27-10g
+mehtabr
+scn27-10g
+Node: scn33-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 7, GPUs Available: 1
+heenak
+scn33-10g
+mayankr
+scn33-10g
+smallah
+scn33-10g
+avusulak
+scn33-10g
+prathosh
+scn33-10g
+Node: scn37-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+gaganp
+scn37-10g
+aaziz
+scn37-10g
+mehtabr
+scn37-10g
+Node: scn39-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+aaziz
+scn39-10g
+aaziz
+scn39-10g
+aaziz
+scn39-10g
+heenak
+scn39-10g
+Node: scn40-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 7, GPUs Available: 1
+sangeeta
+scn40-10g
+heenak
+scn40-10g
+skpanda
+scn40-10g
+skpanda
+scn40-10g
+rfshah
+scn40-10g
+renu
+scn40-10g
+Node: scn43-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn43-10g
+mrana
+scn43-10g
+mrana
+scn43-10g
+Node: scn44-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn44-10g
+mayankr
+scn44-10g
+mrana
+scn44-10g
+chpriya
+scn44-10g
+mrana
+scn44-10g
+Node: scn45-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn45-10g
+skpanda
+scn45-10g
+mayankr
+scn45-10g
+chpriya
+scn45-10g
+mayankr
+scn45-10g
+Node: scn46-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+gaganp
+scn46-10g
+rfshah
+scn46-10g
+Node: scn47-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn47-10g
+mehtabr
+scn47-10g
+Node: scn48-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+gaganp
+scn48-10g
+rfshah
+scn48-10g
+mehtabr
+scn48-10g
+Node: scn49-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn49-10g
+mehtabr
+scn49-10g
+Node: scn50-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+rfshah
+scn50-10g
+gaganp
+scn50-10g
+mrana
+scn50-10g
+smallah
+scn50-10g
+Node: scn51-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn51-10g
+Node: scn52-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+rfshah
+scn52-10g
+rfshah
+scn52-10g
+Node: scn53-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn53-10g
+rfshah
+scn53-10g
+mehtabr
+scn53-10g
+Node: scn54-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 3, GPUs Available: 5
+gaganp
+scn54-10g
+skpanda
+scn54-10g
+chpriya
+scn54-10g
+renu
+scn54-10g
+Node: scn55-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+srkumar
+scn55-10g
+mehtabr
+scn55-10g
+chpriya
+scn55-10g
+Node: scn56-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+srkumar
+scn56-10g
+chpriya
+scn56-10g
+Node: scn57-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+srkumar
+scn57-10g
+skpanda
+scn57-10g
+mrana
+scn57-10g
+chpriya
+scn57-10g
+smallah
+scn57-10g
+smallah
+scn57-10g
+Node: scn58-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 1, GPUs Available: 7
+srkumar
+scn58-10g
+sarthakt
+scn58-10g
+Node: scn59-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn59-10g
+Node: scn60-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn60-10g
+Node: scn61-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+amolbr
+scn61-10g
+mehtabr
+scn61-10g
+Node: scn62-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn62-10g
+mehtabr
+scn62-10g
+Node: scn63-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn63-10g
+Node: scn64-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+srkumar
+scn64-10g
+mehtabr
+scn64-10g
+Node: scn65-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn65-10g
+ankushb
+scn65-10g
+ssasmal
+scn65-10g
+Node: scn66-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+ankushb
+scn66-10g
+heenak
+scn66-10g
+mrana
+scn66-10g
+mayankr
+scn66-10g
+Node: scn67-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn67-10g
+ankushb
+scn67-10g
+mrana
+scn67-10g
+mrana
+scn67-10g
+Node: scn68-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn68-10g
+mehtabr
+scn68-10g
+Node: scn69-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn69-10g
+chpriya
+scn69-10g
+gundluru
+scn69-10g
+Node: scn70-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+sangeeta
+scn70-10g
+skpanda
+scn70-10g
+skpanda
+scn70-10g
+chpriya
+scn70-10g
+Node: scn71-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+srkumar
+scn71-10g
+chpriya
+scn71-10g
+Node: scn72-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+rfshah
+scn72-10g
+chpriya
+scn72-10g
+Node: scn73-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+gaganp
+scn73-10g
+rfshah
+scn73-10g
+mehtabr
+scn73-10g
+chpriya
+scn73-10g
+Node: scn74-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn74-10g
+heenak
+scn74-10g
+skpanda
+scn74-10g
+mrana
+scn74-10g
+mayankr
+scn74-10g
+chpriya
+scn74-10g
+Node: scn78-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 3, GPUs Available: 5
+abrahane
+scn78-10g
+sarthakt
+scn78-10g
+ssharma
+scn78-10g
+skpasha
+scn78-10g
+Node: scn79-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn79-10g
+mayankr
+scn79-10g
+mayankr
+scn79-10g
+adlaxmi
+scn79-10g
+Node: scn80-10g, Partition: dgxnp, GPUs Capacity: 8, GPUs Assigned: 2, GPUs Available: 6
+sangeeta
+scn80-10g
+skpanda
+scn80-10g
+Node: scn1-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+kaditya
+scn1-10g
+mayankr
+scn1-10g
+smallah
+scn1-10g
+smallah
+scn1-10g
+smallah
+scn1-10g
+smallah
+scn1-10g
+Node: scn15-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn15-10g
+mehtabr
+scn15-10g
+Node: scn16-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+gaganp
+scn16-10g
+rfshah
+scn16-10g
+mrana
+scn16-10g
+adlaxmi
+scn16-10g
+Node: scn21-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+ankushb
+scn21-10g
+rfshah
+scn21-10g
+karunesh
+scn21-10g
+mehtabr
+scn21-10g
+Node: scn23-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 5, GPUs Available: 3
+srkumar
+scn23-10g
+mayankr
+scn23-10g
+mayankr
+scn23-10g
+smallah
+scn23-10g
+Node: scn25-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn25-10g
+mrana
+scn25-10g
+mayankr
+scn25-10g
+skpanda
+scn25-10g
+Node: scn27-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+amolbr
+scn27-10g
+mehtabr
+scn27-10g
+Node: scn28-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 4, GPUs Available: 4
+srkumar
+scn28-10g
+Node: scn29-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn29-10g
+Node: scn30-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn30-10g
+Node: scn32-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn32-10g
+Node: scn33-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 7, GPUs Available: 1
+heenak
+scn33-10g
+mayankr
+scn33-10g
+smallah
+scn33-10g
+avusulak
+scn33-10g
+prathosh
+scn33-10g
+Node: scn37-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+gaganp
+scn37-10g
+aaziz
+scn37-10g
+mehtabr
+scn37-10g
+Node: scn39-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+aaziz
+scn39-10g
+aaziz
+scn39-10g
+aaziz
+scn39-10g
+heenak
+scn39-10g
+Node: scn40-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 7, GPUs Available: 1
+sangeeta
+scn40-10g
+heenak
+scn40-10g
+skpanda
+scn40-10g
+skpanda
+scn40-10g
+rfshah
+scn40-10g
+renu
+scn40-10g
+Node: scn43-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn43-10g
+mrana
+scn43-10g
+mrana
+scn43-10g
+Node: scn44-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn44-10g
+mayankr
+scn44-10g
+mrana
+scn44-10g
+chpriya
+scn44-10g
+mrana
+scn44-10g
+Node: scn45-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn45-10g
+skpanda
+scn45-10g
+mayankr
+scn45-10g
+chpriya
+scn45-10g
+mayankr
+scn45-10g
+Node: scn46-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+gaganp
+scn46-10g
+rfshah
+scn46-10g
+Node: scn47-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+kaditya
+scn47-10g
+mehtabr
+scn47-10g
+Node: scn48-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+gaganp
+scn48-10g
+rfshah
+scn48-10g
+mehtabr
+scn48-10g
+Node: scn49-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn49-10g
+mehtabr
+scn49-10g
+Node: scn50-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+rfshah
+scn50-10g
+gaganp
+scn50-10g
+mrana
+scn50-10g
+smallah
+scn50-10g
+Node: scn5-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn5-10g
+gaganp
+scn5-10g
+Node: scn51-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn51-10g
+Node: scn52-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+rfshah
+scn52-10g
+rfshah
+scn52-10g
+Node: scn53-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn53-10g
+rfshah
+scn53-10g
+mehtabr
+scn53-10g
+Node: scn54-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 3, GPUs Available: 5
+gaganp
+scn54-10g
+skpanda
+scn54-10g
+chpriya
+scn54-10g
+renu
+scn54-10g
+Node: scn55-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+srkumar
+scn55-10g
+mehtabr
+scn55-10g
+chpriya
+scn55-10g
+Node: scn56-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+srkumar
+scn56-10g
+chpriya
+scn56-10g
+Node: scn57-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+srkumar
+scn57-10g
+skpanda
+scn57-10g
+mrana
+scn57-10g
+chpriya
+scn57-10g
+smallah
+scn57-10g
+smallah
+scn57-10g
+Node: scn58-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 1, GPUs Available: 7
+srkumar
+scn58-10g
+sarthakt
+scn58-10g
+Node: scn59-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn59-10g
+Node: scn60-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn60-10g
+Node: scn6-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn6-10g
+gaganp
+scn6-10g
+Node: scn61-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+amolbr
+scn61-10g
+mehtabr
+scn61-10g
+Node: scn62-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn62-10g
+mehtabr
+scn62-10g
+Node: scn63-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+abrahane
+scn63-10g
+Node: scn64-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+srkumar
+scn64-10g
+mehtabr
+scn64-10g
+Node: scn65-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn65-10g
+ankushb
+scn65-10g
+ssasmal
+scn65-10g
+Node: scn66-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 6, GPUs Available: 2
+ankushb
+scn66-10g
+heenak
+scn66-10g
+mrana
+scn66-10g
+mayankr
+scn66-10g
+Node: scn67-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn67-10g
+ankushb
+scn67-10g
+mrana
+scn67-10g
+mrana
+scn67-10g
+Node: scn68-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn68-10g
+mehtabr
+scn68-10g
+Node: scn69-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+heenak
+scn69-10g
+chpriya
+scn69-10g
+gundluru
+scn69-10g
+Node: scn70-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+sangeeta
+scn70-10g
+skpanda
+scn70-10g
+skpanda
+scn70-10g
+chpriya
+scn70-10g
+Node: scn71-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+srkumar
+scn71-10g
+chpriya
+scn71-10g
+Node: scn72-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 0, GPUs Available: 8
+rfshah
+scn72-10g
+chpriya
+scn72-10g
+Node: scn73-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+gaganp
+scn73-10g
+rfshah
+scn73-10g
+mehtabr
+scn73-10g
+chpriya
+scn73-10g
+Node: scn74-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+rfshah
+scn74-10g
+heenak
+scn74-10g
+skpanda
+scn74-10g
+mrana
+scn74-10g
+mayankr
+scn74-10g
+chpriya
+scn74-10g
+Node: scn78-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 3, GPUs Available: 5
+abrahane
+scn78-10g
+sarthakt
+scn78-10g
+ssharma
+scn78-10g
+skpasha
+scn78-10g
+Node: scn79-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 8, GPUs Available: 0
+abrahane
+scn79-10g
+mayankr
+scn79-10g
+mayankr
+scn79-10g
+adlaxmi
+scn79-10g
+Node: scn80-10g, Partition: cpup, GPUs Capacity: 8, GPUs Assigned: 2, GPUs Available: 6
+sangeeta
+scn80-10g
+skpanda
+scn80-10g
+Total Nodes: 98
+Total GPUs Available: 784
+Total GPUs Assigned: 548
+GPU Usage per User (sorted):
+mehtabr: 224 GPUs
+mrana: 80 GPUs
+skpanda: 60 GPUs
+mayankr: 48 GPUs
+smallah: 18 GPUs
+ssasmal: 16 GPUs
+gundluru: 16 GPUs
+adlaxmi: 16 GPUs
+avusulak: 6 GPUs
+sarthakt: 4 GPUs
+rfshah: 4 GPUs
+renu: 4 GPUs
+ssharma: 2 GPUs
+skpasha: 2 GPUs
+prathosh: 2 GPUs
+gaganp: 2 GPUs
+srkumar: 0 GPUs
+sangeeta: 0 GPUs
+karunesh: 0 GPUs
+kaditya: 0 GPUs
+heenak: 0 GPUs
+chpriya: 0 GPUs
+ankushb: 0 GPUs
+amolbr: 0 GPUs
+abrahane: 0 GPUs
+aaziz: 0 GPUs
